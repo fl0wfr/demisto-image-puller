@@ -1,0 +1,6 @@
+#!/bin/bash
+cd /app
+git clone --branch $1 https://github.com/demisto/content.git
+for i in `find /app/content -type f -name "*.yml" | grep Integrations`; do grep dockerimage $i | grep demisto | sed 's/^.*dockerimage: //g' >> /app/docker.list.tmp; done
+cat /app/docker.list.tmp | sort | uniq -u > /app/docker.list
+for i in `cat /app/docker.list`; do mkdir /app/docker/$(echo $i | sed 's/.*demisto\///g' | sed 's/:/_/g'); /app/download-frozen-image-v2.sh /app/docker/$(echo $i | sed 's/.*demisto\///g' | sed 's/:/_/g') $i; done
